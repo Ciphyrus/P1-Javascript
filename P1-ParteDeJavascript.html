@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>Minha Biblioteca de Fotos</title>
+		
+		<style type="text/css">
+			.img-block{
+				width: 50%;
+				float: left;
+				height: 300px;
+			}
+			.img-block img{
+				margin-left: 21.5%;
+			}
+			.img-block button{
+				width: 19%;
+			}
+			.favoritar{
+				margin-left: 21.5%;
+			}
+			.img-block input{
+				width: 57%;
+				margin-left: 21.5%;
+			}
+			.img-block p{
+				width: 57%;
+				margin-left: 21.5%;
+			}
+			
+			.titulo{
+				text-align: center;
+			}
+			.btn-carregar{
+				width: 20%;
+				margin-left: 40%;
+			}
+			.imagens {
+				width: 60%;
+				margin-left: 20%;
+			}
+		</style>
+		
+		<script type="text/javascript">
+			async function pegarImg() {
+				const response = await fetch('https://picsum.photos/v2/list?page=1&limit=30');
+		
+			    return await response.json();
+			}
+			
+			function carregarImg(){
+				pegarImg().then(response => {
+					console.log(response);
+					var imgs = response;
+					
+					for (var i = 0; i < imgs.length; i++){
+						console.log(imgs[i].download_url.length);
+						imgs[i].download_url = imgs[i].download_url.substring(0, imgs[i].download_url.length - 10);
+						imgs[i].download_url += "/300/200";
+						console.log(imgs[i].download_url);
+						adicionarDivImg(imgs[i].download_url);
+					};
+				}).catch(error => {
+					console.log(error);
+				});
+			}
+			
+			function adicionarDivImg(url){
+				var divImgBlock = "";
+				
+				divImgBlock += "<div class='img-block'><img src=" + url + "><br>" +
+					"<button class='favoritar' onclick='favoritar(this)'>Favoritar</button>" +
+					"<button class='anotar' onclick='anotar(this)'>Anotar</button>" +
+					"<button class='remover' onclick='remover(this)'>Remover</button>" + 
+					"<p class='anotacao'></p>" + 
+					"<input type='hidden' class='caixaTexto' onblur='anotar(this)'></div>";
+				
+				document.getElementById("imagens").innerHTML += divImgBlock;
+			}
+			
+			function favoritar(botao){
+				if (botao.innerText == "Favoritar")
+					botao.innerText = "Desfavoritar";
+				else
+					botao.innerText = "Favoritar";
+			}
+			
+			function anotar(botao){
+				var div = botao.parentNode; 
+				var p = div.getElementsByTagName("p")[0];
+				var input = div.getElementsByTagName("input")[0];
+				
+				botao = div.getElementsByTagName("button")[1];
+				
+				if (botao.innerText == "Anotar"){
+					botao.innerText = "Salvar";
+					
+					input.type = "text";
+					if (p.innerText == undefined){
+						input.value = "";
+					}else{
+						input.value = p.innerText;
+					}
+					p.innerText = "";
+				} else {
+					botao.innerText = "Anotar";
+					
+					input.type = "hidden";
+					if (input.value == undefined){
+						p.innerText = "";
+					}else{
+						p.innerText = input.value;
+					}
+				}
+			}
+			
+			function remover(botao){
+				var div = botao.parentNode;
+				div.remove();
+			}
+		</script>
+	</head>
+	<body>
+		<h1 class="titulo">Minha Biblioteca de Fotos:</h1>
+		<button onclick="carregarImg()" class="btn-carregar">Carregar imagens</button>
+	
+		<div id="imagens" class="imagens">
+		</div>
+	</body>
+</html>
